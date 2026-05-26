@@ -1,4 +1,4 @@
-> **Note:** A full project writeup can be found in the 'Secure_S3FS_Report' pdf file in the repository.****
+> **Note:** A full project writeup can be found in the 'Secure_S3FS_Report' pdf file in the repository.
 
 # Secure S3FS
  

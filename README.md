@@ -1,21 +1,22 @@
 # Secure S3FS
  
-A modified implementation of [s3fs-fuse](https://github.com/s3fs-fuse/s3fs-fuse) that adds transparent client-side AES-256-CBC encryption, ensuring files are encrypted **before** they leave your machine and are uploaded to Amazon S3.
+A modified implementation of [s3fs-fuse](https://github.com/s3fs-fuse/s3fs-fuse) that adds transparent client-side AES-256-CBC encryption, ensuring files are encrypted before they leave your machine and are uploaded to Amazon S3.
  
 ## Overview
  
-Standard s3fs delegates data security to Amazon. This project intercepts file I/O at the filesystem level so that only ciphertext ever reaches S3 — you retain full control over your encryption keys and data privacy. Files can be decrypted locally through the mounted bucket, the included standalone AES tool, or OpenSSL directly.
+Standard s3fs delegates data security to Amazon. This project intercepts file I/O at the filesystem level so that only ciphertext ever reaches S3. This means you retain full control over your encryption keys and data privacy. Files can be decrypted locally through the mounted bucket, the included standalone AES tool, or OpenSSL directly.
  
 ## Features
  
-- **Transparent encryption/decryption** — applications read and write files normally; encryption is handled entirely by the filesystem
-- **AES-256-CBC with salting** — compatible with OpenSSL's `aes-256-cbc` implementation
-- **In-place file-level encryption** — optimized read/write strategy avoids redundant temporary files
-- **Standalone AES tool** — encrypt or decrypt any file independently of the filesystem, with full OpenSSL interoperability
-- **S3 console compatibility** — files downloaded directly from the S3 console are in encrypted form and can be decrypted with either the standalone tool or OpenSSL
+- **Transparent encryption/decryption** - applications read and write files normally; encryption is handled entirely by the filesystem
+- **AES-256-CBC with salting** - compatible with OpenSSL's `aes-256-cbc` implementation
+- **In-place file-level encryption** - optimized read/write strategy avoids redundant temporary files
+- **Standalone AES tool** - encrypt or decrypt any file independently of the filesystem, with full OpenSSL interoperability
+- **S3 console compatibility** - files downloaded directly from the S3 console are in encrypted form and can be decrypted with either the standalone tool or OpenSSL
+
 ## Architecture
  
-Encryption and decryption are implemented at the **file level** inside `fdcache_entity.cpp`:
+Encryption and decryption are implemented at the file level inside `fdcache_entity.cpp`:
  
 - **Decrypt** — called inside `FdEntity::Load()` immediately after a file is downloaded from S3, before it is exposed to any application
 - **Encrypt** — called inside `FdEntity::RowFlushHasLock()` just before upload logic runs, covering all upload types (multipart, stream, etc.)
@@ -23,6 +24,7 @@ Both functions operate on a single file descriptor and use an optimized in-place
  
 - **Decryption** reads 16 bytes ahead of the write cursor, ensuring plaintext is never written over unread ciphertext
 - **Encryption** pre-reads one buffer before the write loop begins, preventing the `Salted__(bytes)` header and growing ciphertext from overwriting unread plaintext
+
 ## Standalone AES Tool
  
 A separate command-line utility for encrypting and decrypting files using AES-256-CBC.

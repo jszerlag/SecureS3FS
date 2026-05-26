@@ -1,3 +1,5 @@
+> **Note:** A full project writeup can be found in the 'Secure_S3FS_Report' pdf file in the repository.****
+
 # Secure S3FS
  
 A modified implementation of [s3fs-fuse](https://github.com/s3fs-fuse/s3fs-fuse) that adds transparent client-side AES-256-CBC encryption, ensuring files are encrypted before they leave your machine and are uploaded to Amazon S3.
